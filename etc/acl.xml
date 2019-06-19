@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Xigen_TierPricingUpload::xigen_tierpricingupload" sortOrder="10" title="xigen tierpricingupload">
+					<resource id="Xigen_TierPricingUpload::import_index" sortOrder="10" title="import index"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

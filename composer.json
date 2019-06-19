@@ -1,0 +1,22 @@
+{
+    "name": "dominicwatts/tierpricingupload",
+    "description": "",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Dominic Xigen",
+            "email": "dominic@xigen.co.uk"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Xigen\\TierPricingUpload\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
