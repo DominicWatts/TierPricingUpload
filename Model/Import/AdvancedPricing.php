@@ -226,6 +226,25 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
     }
 
     /**
+     * Create Advanced price data from raw data.
+     *
+     * @throws \Exception
+     * @return bool Result of operation.
+     */
+    protected function _importData()
+    {
+        if (\Magento\ImportExport\Model\Import::BEHAVIOR_DELETE == $this->getBehavior()) {
+            $this->deleteAdvancedPricing();
+        } elseif (\Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $this->getBehavior()) {
+            $this->replaceAdvancedPricing();
+        } elseif (\Magento\ImportExport\Model\Import::BEHAVIOR_APPEND == $this->getBehavior()) {
+            $this->saveAdvancedPricing();
+        }
+
+        return true;
+    }
+
+    /**
      * Entity type code getter.
      *
      * @return string
@@ -272,56 +291,25 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
     }
 
     /**
-     * Create Advanced price data from raw data.
-     *
-     * @throws \Exception
-     * @return bool Result of operation.
-     */
-    protected function _importData()
-    {
-        if (\Magento\ImportExport\Model\Import::BEHAVIOR_DELETE == $this->getBehavior()) {
-            $this->deleteAdvancedPricing();
-        } elseif (\Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $this->getBehavior()) {
-            $this->replaceAdvancedPricing();
-        } elseif (\Magento\ImportExport\Model\Import::BEHAVIOR_APPEND == $this->getBehavior()) {
-            $this->saveAdvancedPricing();
-        }
-
-        return true;
-    }
-
-    /**
-     * Save advanced pricing
-     *
+     * Deletes Advanced price data from raw data
+     * @param array $importData
      * @return $this
      */
-    public function saveAdvancedPricing()
-    {
-        $this->saveAndReplaceAdvancedPrices();
-        return $this;
-    }
-
-    /**
-     * Deletes Advanced price data from raw data.
-     *
-     * @return $this
-     */
-    public function deleteAdvancedPricing()
+    public function deleteAdvancedPricing($importData)
     {
         $this->_cachedSkuToDelete = null;
         $listSku = [];
-        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-            foreach ($bunch as $rowNum => $rowData) {
-                $this->validateRow($rowData, $rowNum);
-                if (!$this->getErrorAggregator()->isRowInvalid($rowNum)) {
-                    $rowSku = $rowData[self::COL_SKU];
-                    $listSku[] = $rowSku;
-                }
-                if ($this->getErrorAggregator()->hasToBeTerminated()) {
-                    $this->getErrorAggregator()->addRowToSkip($rowNum);
-                }
+        foreach ($importData as $rowNum => $rowData) {
+            $this->validateRow($rowData, $rowNum);
+            if (!$this->getErrorAggregator()->isRowInvalid($rowNum)) {
+                $rowSku = $rowData[self::COL_SKU];
+                $listSku[] = $rowSku;
+            }
+            if ($this->getErrorAggregator()->hasToBeTerminated()) {
+                $this->getErrorAggregator()->addRowToSkip($rowNum);
             }
         }
+        
         if ($listSku) {
             $this->deleteProductTierPrices(array_unique($listSku), self::TABLE_TIER_PRICE);
             $this->setUpdatedAt($listSku);
@@ -330,21 +318,19 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
     }
 
     /**
-     * Replace advanced pricing
-     *
-     * @return $this
+     * Deletes advanced price data from raw data
+     * @param array $importData
+     * @param string $behavior
+     * @return void
      */
-    public function replaceAdvancedPricing()
-    {
-        $this->saveAndReplaceAdvancedPrices();
-        return $this;
-    }
-
-
-    public function xigenSaveAndReplaceAdvancedPrices($importData)
+    public function saveAdvancedPrices($importData, $behavior)
     {
         $tierPrices = [];
         $listSku = [];
+
+        if (!$behavior) {
+            throw new LocalizedException(__('Behaviour mode not set'));
+        }
 
         foreach ($importData as $rowNum => $rowData) {
             if (!$this->validateRow($rowData, $rowNum)) {
@@ -359,15 +345,18 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
             $rowSku = $rowData[self::COL_SKU];
             $listSku[] = $rowSku;
             if (!empty($rowData[self::COL_TIER_PRICE_WEBSITE])) {
+                $supplierName = $rowData[self::COL_TIER_SUPPLIER_NAME] ?? null;
+                $supplierPrice = $rowData[self::COL_TIER_SUPPLIER_PRICE] ?? null;
+
                 $tierPrices[$rowSku][] = [
                     'all_groups' => $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP] == self::VALUE_ALL_GROUPS,
                     'customer_group_id' => $this->getCustomerGroupId(
                         $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP]
                     ),
                     'qty' => $rowData[self::COL_TIER_PRICE_QTY],
-                    'supplier_name' => $rowData[self::COL_TIER_SUPPLIER_NAME],
-                    'supplier_price' => $rowData[self::COL_TIER_SUPPLIER_PRICE],
-                    'supplier_update' => $rowData[self::COL_TIER_SUPPLIER_NAME] != '' && $rowData[self::COL_TIER_SUPPLIER_PRICE] != ''
+                    'supplier_name' => $supplierName,
+                    'supplier_price' => $supplierPrice,
+                    'supplier_update' => $supplierName != '' && $supplierPrice != ''
                         ? date("d/m/y") : null,
                     'value' => $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_FIXED
                         ? $rowData[self::COL_TIER_PRICE] : 0,
@@ -378,74 +367,20 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
             }
         }
 
-        if ($listSku) {
-            $this->processCountNewPrices($tierPrices);
-            if ($this->deleteProductTierPrices(array_unique($listSku), self::TABLE_TIER_PRICE)) {
-                $this->saveProductPrices($tierPrices, self::TABLE_TIER_PRICE);
-                $this->setUpdatedAt($listSku);
-            }
-        }
-    }
-
-
-    /**
-     * Save and replace advanced prices
-     *
-     * @return $this
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    protected function saveAndReplaceAdvancedPrices()
-    {
-        $behavior = $this->getBehavior();
-        if (\Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $behavior) {
-            $this->_cachedSkuToDelete = null;
-        }
-        $listSku = [];
-        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-            $tierPrices = [];
-            foreach ($bunch as $rowNum => $rowData) {
-                if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addRowError(ValidatorInterface::ERROR_SKU_IS_EMPTY, $rowNum);
-                    continue;
-                }
-                if ($this->getErrorAggregator()->hasToBeTerminated()) {
-                    $this->getErrorAggregator()->addRowToSkip($rowNum);
-                    continue;
-                }
-
-                $rowSku = $rowData[self::COL_SKU];
-                $listSku[] = $rowSku;
-                if (!empty($rowData[self::COL_TIER_PRICE_WEBSITE])) {
-                    $tierPrices[$rowSku][] = [
-                        'all_groups' => $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP] == self::VALUE_ALL_GROUPS,
-                        'customer_group_id' => $this->getCustomerGroupId(
-                            $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP]
-                        ),
-                        'qty' => $rowData[self::COL_TIER_PRICE_QTY],
-                        'value' => $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_FIXED
-                            ? $rowData[self::COL_TIER_PRICE] : 0,
-                        'percentage_value' => $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_PERCENT
-                            ? $rowData[self::COL_TIER_PRICE] : null,
-                        'website_id' => $this->getWebSiteId($rowData[self::COL_TIER_PRICE_WEBSITE])
-                    ];
-                }
-            }
-            if (\Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $behavior) {
-                if ($listSku) {
-                    $this->processCountNewPrices($tierPrices);
-                    if ($this->deleteProductTierPrices(array_unique($listSku), self::TABLE_TIER_PRICE)) {
-                        $this->saveProductPrices($tierPrices, self::TABLE_TIER_PRICE);
-                        $this->setUpdatedAt($listSku);
-                    }
-                }
-            } elseif (\Magento\ImportExport\Model\Import::BEHAVIOR_APPEND == $behavior) {
-                $this->processCountExistingPrices($tierPrices, self::TABLE_TIER_PRICE)
-                    ->processCountNewPrices($tierPrices);
-                $this->saveProductPrices($tierPrices, self::TABLE_TIER_PRICE);
-                if ($listSku) {
+        if ($behavior == \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE) {
+            if ($listSku) {
+                $this->processCountNewPrices($tierPrices);
+                if ($this->deleteProductTierPrices(array_unique($listSku), self::TABLE_TIER_PRICE)) {
+                    $this->saveProductPrices($tierPrices, self::TABLE_TIER_PRICE);
                     $this->setUpdatedAt($listSku);
                 }
+            }
+        } elseif ($behavior == \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND) {
+            $this->processCountExistingPrices($tierPrices, self::TABLE_TIER_PRICE)
+                ->processCountNewPrices($tierPrices);
+            $this->saveProductPrices($tierPrices, self::TABLE_TIER_PRICE);
+            if ($listSku) {
+                $this->setUpdatedAt($listSku);
             }
         }
         return $this;

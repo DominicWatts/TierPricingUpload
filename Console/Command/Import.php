@@ -70,33 +70,47 @@ class Import extends Command
         $import = $input->getArgument(self::IMPORT_ARGUMENT) ?: false;
         $importData = [];
         if ($import) {
+            $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
             $this->output->writeln((string)__('[%1] Start', $this->dateTime->gmtDate()));
                         
             $imports = $this->csvImportHelper->getImports();
             $progress = new ProgressBar($this->output, count($imports));
             $progress->start();
+
+            $processArray = [];
             foreach ($imports as $import) {
                 $priceEntry = $this->csvImportHelper->parseImport($import);
-  
-                if (!isset($priceEntry['sku'])) {
-                    throw new LocalizedException(__('Problem with data'));
-                }
-
-                $product = $this->importHelper->get($priceEntry['sku']);
-                if (!$product) {
-                    $this->output->writeln((string)__('[%1] Sku not found : %2', $this->dateTime->gmtDate(), $priceEntry['sku']));
-                    continue;
-                }
-
-                $importData[] = $priceEntry;
-                $progress->advance();
+                $processArray[$priceEntry['sku']][] = $priceEntry;
             }
 
-            $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $this->tier = $this->_objectManager->create(\Xigen\TierPricingUpload\Model\Import\AdvancedPricing::class);
-            $this->tier->xigenSaveAndReplaceAdvancedPrices($importData);
+            foreach ($processArray as $sku => $tierPricing) {
+                $importData = [];
+                
+                foreach ($tierPricing as $tierPrice) {
+                    if (!isset($tierPrice['sku'])) {
+                        throw new LocalizedException(__('Problem with data'));
+                    }
+    
+                    $product = $this->importHelper->get($tierPrice['sku']);
+                    if (!$product) {
+                        $this->output->writeln((string)__('[%1] Sku not found : %2', $this->dateTime->gmtDate(), $tierPrice['sku']));
+                        continue;
+                    }
 
-            $progress->advance();
+                    $importData = $tierPricing;
+
+                    $progress->advance();
+                }
+
+                if ($importData) {
+                    $this->tier = $this->_objectManager->create(\Xigen\TierPricingUpload\Model\Import\AdvancedPricing::class);
+                    $this->tier->saveAdvancedPrices($importData, \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE);
+                    $this->output->writeln((string)__('[%1] Sku processed : %2', $this->dateTime->gmtDate(), $sku));
+                    $this->csvImportHelper->deleteImportBySku($sku);
+                }
+            }
+
             $progress->finish();
             
             $this->output->writeln('');
