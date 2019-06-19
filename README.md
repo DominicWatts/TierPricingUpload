@@ -21,6 +21,6 @@ Once import queue has been built tier pricing can be inserted a couple of ways
 
 ## Console commnad ## 
 
-xigen:tierpricing:import <import>
+`xigen:tierpricing:import <import>`
 
 `php bin/magento xigen:tierpricing:import import`
