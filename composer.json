@@ -1,6 +1,6 @@
 {
     "name": "dominicwatts/tierpricingupload",
-    "description": "Tier pricing upload which extends beyond csv upload extensio",
+    "description": "Tier pricing upload which extends beyond csv upload extension",
     "type": "magento2-module",
     "license": "proprietary",
     "version": "1.0.0",
