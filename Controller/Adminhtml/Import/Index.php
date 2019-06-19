@@ -3,9 +3,11 @@
 
 namespace Xigen\TierPricingUpload\Controller\Adminhtml\Import;
 
+/**
+ * Index controller class
+ */
 class Index extends \Magento\Backend\App\Action
 {
-
     protected $resultPageFactory;
 
     /**

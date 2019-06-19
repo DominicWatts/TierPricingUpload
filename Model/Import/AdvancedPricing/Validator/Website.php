@@ -9,6 +9,9 @@ use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 use Magento\CatalogImportExport\Model\Import\Product\Validator\AbstractImportValidator;
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface;
 
+/**
+ * Website class
+ */
 class Website extends AbstractImportValidator implements RowValidatorInterface
 {
     /**

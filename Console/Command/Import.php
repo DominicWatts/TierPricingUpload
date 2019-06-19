@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
 /**
  * Import console
@@ -58,8 +59,8 @@ class Import extends Command
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected function execute(
         InputInterface $input,
         OutputInterface $output
@@ -95,6 +96,7 @@ class Import extends Command
                     $product = $this->importHelper->get($tierPrice['sku']);
                     if (!$product) {
                         $this->output->writeln((string)__('[%1] Sku not found : %2', $this->dateTime->gmtDate(), $tierPrice['sku']));
+                        $this->csvImportHelper->deleteImportBySku($sku);
                         continue;
                     }
 
@@ -104,7 +106,7 @@ class Import extends Command
                 }
 
                 if ($importData) {
-                    $this->tier = $this->_objectManager->create(\Xigen\TierPricingUpload\Model\Import\AdvancedPricing::class);
+                    $this->tier = $this->_objectManager->create(AdvancedPricing::class);
                     $this->tier->saveAdvancedPrices($importData, \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE);
                     $this->output->writeln((string)__('[%1] Sku processed : %2', $this->dateTime->gmtDate(), $sku));
                     $this->csvImportHelper->deleteImportBySku($sku);

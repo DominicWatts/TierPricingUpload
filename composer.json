@@ -1,8 +1,9 @@
 {
     "name": "dominicwatts/tierpricingupload",
-    "description": "",
+    "description": "Tier pricing upload which extends beyond csv upload extensio",
     "type": "magento2-module",
     "license": "proprietary",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Dominic Xigen",
@@ -10,7 +11,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "dominicwatts/csvupload": "*"
+    },
     "autoload": {
         "psr-4": {
             "Xigen\\TierPricingUpload\\": ""

@@ -8,6 +8,9 @@ namespace Xigen\TierPricingUpload\Model\Import\AdvancedPricing\Validator;
 use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface;
 
+/**
+ * TierPrice class
+ */
 class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Validator\AbstractPrice
 {
     /**
