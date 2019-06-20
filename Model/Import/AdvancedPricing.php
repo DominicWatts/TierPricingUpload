@@ -27,8 +27,6 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
     const COL_TIER_PRICE = 'tier_price';
     const COL_TIER_PRICE_PERCENTAGE_VALUE = 'percentage_value';
     const COL_TIER_PRICE_TYPE = 'tier_price_value_type';
-    const COL_TIER_SUPPLIER_NAME = 'supplier_name';
-    const COL_TIER_SUPPLIER_PRICE = 'supplier_price';
     const TIER_PRICE_TYPE_FIXED = 'Fixed';
     const TIER_PRICE_TYPE_PERCENT = 'Discount';
     const TABLE_TIER_PRICE = 'catalog_product_entity_tier_price';
@@ -345,19 +343,12 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
             $rowSku = $rowData[self::COL_SKU];
             $listSku[] = $rowSku;
             if (!empty($rowData[self::COL_TIER_PRICE_WEBSITE])) {
-                $supplierName = $rowData[self::COL_TIER_SUPPLIER_NAME] ?? null;
-                $supplierPrice = $rowData[self::COL_TIER_SUPPLIER_PRICE] ?? null;
-
                 $tierPrices[$rowSku][] = [
                     'all_groups' => $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP] == self::VALUE_ALL_GROUPS,
                     'customer_group_id' => $this->getCustomerGroupId(
                         $rowData[self::COL_TIER_PRICE_CUSTOMER_GROUP]
                     ),
                     'qty' => $rowData[self::COL_TIER_PRICE_QTY],
-                    'supplier_name' => $supplierName,
-                    'supplier_price' => $supplierPrice,
-                    'supplier_update' => $supplierName != '' && $supplierPrice != ''
-                        ? date("d/m/y") : null,
                     'value' => $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_FIXED
                         ? $rowData[self::COL_TIER_PRICE] : 0,
                     'percentage_value' => $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_PERCENT
