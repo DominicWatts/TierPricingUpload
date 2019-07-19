@@ -1,4 +1,5 @@
 <?php
+
 namespace Xigen\TierPricingUpload\Controller\Adminhtml\Import;
 
 use Magento\Backend\App\Action;
@@ -11,9 +12,9 @@ use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 class Ajax extends \Magento\Backend\App\Action
 {
     /**
-     * @var  \Magento\Framework\Controller\Result\JsonFactory
+     * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    protected $resultPageFactory;
+    protected $resultJsonFactory;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -30,6 +31,14 @@ class Ajax extends \Magento\Backend\App\Action
      */
     protected $csvImportHelper;
 
+    /**
+     * Ajax constructor.
+     * @param Context $context
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Xigen\TierPricingUpload\Helper\Import $importHelper
+     * @param \Xigen\CsvUpload\Helper\Import $csvImportHelper
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
@@ -43,6 +52,7 @@ class Ajax extends \Magento\Backend\App\Action
         $this->importHelper = $importHelper;
         $this->csvImportHelper = $csvImportHelper;
     }
+
     /**
      * @return \Magento\Framework\Controller\Result\Json
      */
@@ -58,7 +68,7 @@ class Ajax extends \Magento\Backend\App\Action
             return $this->returnJson('finish', __('%1 - please check import data', $e->getMessage()), 0);
         }
     }
-   
+
     /**
      * Import tier pricing process
      * @param string $type
@@ -73,7 +83,7 @@ class Ajax extends \Magento\Backend\App\Action
             $priceEntry = $this->csvImportHelper->parseImport($import);
             $processArray[$priceEntry['sku']][] = $priceEntry;
         }
-            
+
         foreach ($processArray as $sku => $tierPricing) {
             $importData = [];
             try {
@@ -107,9 +117,9 @@ class Ajax extends \Magento\Backend\App\Action
         }
         return $this->returnJson('finish', 'Process complete', 0);
     }
+
     /**
      * Return Json response
-     *
      * @param string $action
      * @param string $message
      * @param int $process

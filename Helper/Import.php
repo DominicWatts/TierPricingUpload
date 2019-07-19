@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Xigen\TierPricingUpload\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -10,9 +9,33 @@ use Magento\Framework\App\Helper\AbstractHelper;
  */
 class Import extends AbstractHelper
 {
+    /**
+     * @var \Magento\Catalog\Api\Data\ProductInterfaceFactory
+     */
+    protected $productInterfaceFactory;
 
     /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    protected $productRepositoryInterface;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var \Magento\Customer\Model\GroupFactory
+     */
+    protected $groupFactory;
+
+    /**
+     * Import constructor.
      * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Catalog\Api\Data\ProductInterfaceFactory $productInterfaceFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Customer\Model\GroupFactory $groupFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -49,6 +72,7 @@ class Import extends AbstractHelper
      */
     public function loadCustomerGroupByCode($groupCode)
     {
-        return $groupFactory->create()->load($groupCode, 'customer_group_code');
+        return $this->groupFactory->create()
+            ->load($groupCode, 'customer_group_code');
     }
 }
