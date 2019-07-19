@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Xigen\TierPricingUpload\Block\Adminhtml\Import;
 
 /**
@@ -8,11 +7,15 @@ namespace Xigen\TierPricingUpload\Block\Adminhtml\Import;
  */
 class Index extends \Magento\Backend\Block\Template
 {
+    /**
+     * @var \Xigen\CsvUpload\Model\ImportFactory
+     */
+    protected $importFactory;
 
     /**
-     * Constructor
-     *
-     * @param \Magento\Backend\Block\Template\Context  $context
+     * Index constructor.
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param \Xigen\CsvUpload\Model\ImportFactory $importFactory
      * @param array $data
      */
     public function __construct(
