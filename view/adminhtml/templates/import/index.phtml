@@ -1,3 +1,5 @@
+<a href="<?= $block->escapeUrl($block->getViewFileUrl('Xigen_TierPricingUpload::template.csv'));?>" target="_blank"><?= $block->escapeHtml(__("CSV Template")); ?></a>
+
 <?php if ($block->isImports()) : ?>
 
     <form method="post" enctype="multipart/form-data">
