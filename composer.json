@@ -11,8 +11,16 @@
         }
     ],
     "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
     "require": {
-        "dominicwatts/csvupload": "*"
+        "dominicwatts/csvupload": "*",
+        "magento/framework": "*",
+        "php": ">=7.0.0"
     },
     "autoload": {
         "psr-4": {

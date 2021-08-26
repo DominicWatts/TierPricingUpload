@@ -5,6 +5,8 @@ namespace Xigen\TierPricingUpload\Console\Command;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\State;
+use Magento\Framework\Console\Cli;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\ImportExport\Model\Import as MagentoImport;
 use Psr\Log\LoggerInterface;
@@ -94,6 +96,7 @@ class Import extends Command
 
     /**
      * {@inheritdoc}
+     * @return int
      */
     protected function execute(
         InputInterface $input,
@@ -131,7 +134,11 @@ class Import extends Command
 
                     $product = $this->importHelper->get($tierPrice['sku']);
                     if (!$product) {
-                        $this->output->writeln((string) __('[%1] Sku not found : %2', $this->dateTime->gmtDate(), $tierPrice['sku']));
+                        $this->output->writeln((string) __(
+                            '[%1] Sku not found : %2',
+                            $this->dateTime->gmtDate(),
+                            $tierPrice['sku']
+                        ));
                         $this->csvImportHelper->deleteImportBySku($sku);
                         continue;
                     }
@@ -153,7 +160,9 @@ class Import extends Command
 
             $this->output->writeln('');
             $this->output->writeln((string) __('[%1] Finish', $this->dateTime->gmtDate()));
+            return Cli::RETURN_SUCCESS;
         }
+        return Cli::RETURN_FAILURE;
     }
 
     /**
