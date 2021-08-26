@@ -7,11 +7,10 @@ namespace Xigen\TierPricingUpload\Model\Import;
 
 use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface as ValidatorInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
 
 /**
- * Class AdvancedPricing
- *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyFields)
@@ -51,8 +50,8 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
         ValidatorInterface::ERROR_INVALID_TIER_PRICE_TYPE => 'Value for \'tier_price_value_type\' ' .
             'attribute contains incorrect value, acceptable values are Fixed, Discount',
         ValidatorInterface::ERROR_TIER_DATA_INCOMPLETE => 'Tier Price data is incomplete',
-        ValidatorInterface::ERROR_INVALID_ATTRIBUTE_DECIMAL =>
-            'Value for \'%s\' attribute contains incorrect value, acceptable values are in decimal format',
+        ValidatorInterface::ERROR_INVALID_ATTRIBUTE_DECIMAL => 'Value for \'%s\' attribute contains ' .
+            'incorrect value, acceptable values are in decimal format',
     ];
 
     /**
@@ -293,7 +292,7 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
      * @param array $importData
      * @return $this
      */
-    public function deleteAdvancedPricing($importData)
+    public function deleteAdvancedPricing($importData = [])
     {
         $this->_cachedSkuToDelete = null;
         $listSku = [];
@@ -307,12 +306,30 @@ class AdvancedPricing extends \Magento\ImportExport\Model\Import\Entity\Abstract
                 $this->getErrorAggregator()->addRowToSkip($rowNum);
             }
         }
-        
+
         if ($listSku) {
             $this->deleteProductTierPrices(array_unique($listSku), self::TABLE_TIER_PRICE);
             $this->setUpdatedAt($listSku);
         }
         return $this;
+    }
+
+    /**
+     * @todo replace advanced pricing functionaliy
+     * @return void
+     */
+    public function replaceAdvancedPricing()
+    {
+        return null;
+    }
+
+    /**
+     * @todo insert advanced pricing functionality
+     * @return void
+     */
+    public function saveAdvancedPricing()
+    {
+        return null;
     }
 
     /**

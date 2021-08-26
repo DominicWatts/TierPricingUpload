@@ -5,12 +5,9 @@
  */
 namespace Xigen\TierPricingUpload\Model\Import\AdvancedPricing\Validator;
 
-use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface;
+use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
-/**
- * TierPrice class
- */
 class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Validator\AbstractPrice
 {
     /**
@@ -45,6 +42,7 @@ class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Valida
 
     /**
      * {@inheritdoc}
+     * @return $this
      */
     public function init($context)
     {
@@ -52,6 +50,7 @@ class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Valida
             $this->customerGroups[$group->getCode()] = $group->getId();
         }
         $this->context = $context;
+        return $this;
     }
 
     /**

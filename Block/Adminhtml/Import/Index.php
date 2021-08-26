@@ -2,10 +2,14 @@
 
 namespace Xigen\TierPricingUpload\Block\Adminhtml\Import;
 
+use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
+use Xigen\CsvUpload\Model\ImportFactory;
+
 /**
  * Index block class
  */
-class Index extends \Magento\Backend\Block\Template
+class Index extends Template
 {
     /**
      * @var \Xigen\CsvUpload\Model\ImportFactory
@@ -19,8 +23,8 @@ class Index extends \Magento\Backend\Block\Template
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Xigen\CsvUpload\Model\ImportFactory $importFactory,
+        Context $context,
+        ImportFactory $importFactory,
         array $data = []
     ) {
         $this->importFactory = $importFactory;
@@ -33,7 +37,8 @@ class Index extends \Magento\Backend\Block\Template
      */
     public function isImports()
     {
-        $importCollection = $this->importFactory->create()
+        $importCollection = $this->importFactory
+            ->create()
             ->getCollection();
         if ($importCollection && $importCollection->getSize() > 0) {
             return true;

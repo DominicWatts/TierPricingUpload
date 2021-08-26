@@ -6,11 +6,8 @@
 namespace Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface;
-use \Magento\Framework\Validator\AbstractValidator;
+use Magento\Framework\Validator\AbstractValidator;
 
-/**
- * Validator class
- */
 class Validator extends AbstractValidator implements RowValidatorInterface
 {
     /**

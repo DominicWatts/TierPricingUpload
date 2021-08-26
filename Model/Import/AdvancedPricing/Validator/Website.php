@@ -4,13 +4,10 @@
 
 namespace Xigen\TierPricingUpload\Model\Import\AdvancedPricing\Validator;
 
-use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
-use Magento\CatalogImportExport\Model\Import\Product\Validator\AbstractImportValidator;
 use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface;
+use Magento\CatalogImportExport\Model\Import\Product\Validator\AbstractImportValidator;
+use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
-/**
- * Website class
- */
 class Website extends AbstractImportValidator implements RowValidatorInterface
 {
     /**
@@ -87,6 +84,10 @@ class Website extends AbstractImportValidator implements RowValidatorInterface
      */
     public function getAllWebsitesValue()
     {
-        return AdvancedPricing::VALUE_ALL_WEBSITES . ' ['.$this->websiteModel->getBaseCurrency()->getCurrencyCode().']';
+        return __(
+            '%1 [%2]',
+            AdvancedPricing::VALUE_ALL_WEBSITES,
+            $this->websiteModel->getBaseCurrency()->getCurrencyCode()
+        );
     }
 }
