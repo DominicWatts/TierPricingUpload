@@ -42,6 +42,7 @@ class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Valida
 
     /**
      * {@inheritdoc}
+     * @return $this
      */
     public function init($context)
     {
@@ -49,6 +50,7 @@ class TierPrice extends \Magento\CatalogImportExport\Model\Import\Product\Valida
             $this->customerGroups[$group->getCode()] = $group->getId();
         }
         $this->context = $context;
+        return $this;
     }
 
     /**

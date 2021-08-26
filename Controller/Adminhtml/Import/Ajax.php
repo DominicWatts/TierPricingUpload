@@ -37,6 +37,11 @@ class Ajax extends Action
     protected $csvImportHelper;
 
     /**
+     * @var Xigen\TierPricingUpload\Model\Import\AdvancedPricing
+     */
+    protected $tier;
+
+    /**
      * Ajax constructor.
      * @param Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
