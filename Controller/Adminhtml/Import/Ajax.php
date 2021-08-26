@@ -2,8 +2,12 @@
 
 namespace Xigen\TierPricingUpload\Controller\Adminhtml\Import;
 
-use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Psr\Log\LoggerInterface;
+use Xigen\CsvUpload\Helper\Import as CsvHelper;
+use Xigen\TierPricingUpload\Helper\Import as TierHelper;
 use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
 /**
@@ -40,11 +44,11 @@ class Ajax extends \Magento\Backend\App\Action
      * @param \Xigen\CsvUpload\Helper\Import $csvImportHelper
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Psr\Log\LoggerInterface $logger,
-        \Xigen\TierPricingUpload\Helper\Import $importHelper,
-        \Xigen\CsvUpload\Helper\Import $csvImportHelper
+        Context $context,
+        JsonFactory $resultJsonFactory,
+        LoggerInterface $logger,
+        TierHelper $importHelper,
+        CsvHelper $csvImportHelper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;

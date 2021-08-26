@@ -2,12 +2,19 @@
 
 namespace Xigen\TierPricingUpload\Console\Command;
 
+use Magento\Framework\App\Area;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\State;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\ImportExport\Model\Import as MagentoImport;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Xigen\CsvUpload\Helper\Import as CsvHelper;
+use Xigen\TierPricingUpload\Helper\Import as TierHelper;
 use Xigen\TierPricingUpload\Model\Import\AdvancedPricing;
 
 /**
@@ -71,11 +78,11 @@ class Import extends Command
      * @param \Xigen\CsvUpload\Helper\Import $csvImportHelper
      */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\App\State $state,
-        \Magento\Framework\Stdlib\DateTime\DateTime $dateTime,
-        \Xigen\TierPricingUpload\Helper\Import $importHelper,
-        \Xigen\CsvUpload\Helper\Import $csvImportHelper
+        LoggerInterface $logger,
+        State $state,
+        DateTime $dateTime,
+        TierHelper $importHelper,
+        CsvHelper $csvImportHelper
     ) {
         $this->logger = $logger;
         $this->state = $state;
@@ -94,13 +101,13 @@ class Import extends Command
     ) {
         $this->input = $input;
         $this->output = $output;
-        $this->state->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
+        $this->state->setAreaCode(Area::AREA_GLOBAL);
 
         $import = $input->getArgument(self::IMPORT_ARGUMENT) ?: false;
 
         $importData = [];
         if ($import) {
-            $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $this->_objectManager = ObjectManager::getInstance();
 
             $this->output->writeln((string) __('[%1] Start', $this->dateTime->gmtDate()));
 
@@ -136,7 +143,7 @@ class Import extends Command
 
                 if ($importData) {
                     $this->tier = $this->_objectManager->create(AdvancedPricing::class);
-                    $this->tier->saveAdvancedPrices($importData, \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE);
+                    $this->tier->saveAdvancedPrices($importData, MagentoImport::BEHAVIOR_REPLACE);
                     $this->output->writeln((string) __('[%1] Sku processed : %2', $this->dateTime->gmtDate(), $sku));
                     $this->csvImportHelper->deleteImportBySku($sku);
                 }

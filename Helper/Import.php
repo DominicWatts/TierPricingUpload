@@ -2,7 +2,12 @@
 
 namespace Xigen\TierPricingUpload\Helper;
 
+use Magento\Catalog\Api\Data\ProductInterfaceFactory;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Customer\Model\GroupFactory;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Psr\Log\LoggerInterface;
 
 /**
  * Import helper class
@@ -38,11 +43,11 @@ class Import extends AbstractHelper
      * @param \Magento\Customer\Model\GroupFactory $groupFactory
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Catalog\Api\Data\ProductInterfaceFactory $productInterfaceFactory,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Customer\Model\GroupFactory $groupFactory
+        Context $context,
+        ProductInterfaceFactory $productInterfaceFactory,
+        ProductRepositoryInterface $productRepositoryInterface,
+        LoggerInterface $logger,
+        GroupFactory $groupFactory
     ) {
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -72,7 +77,8 @@ class Import extends AbstractHelper
      */
     public function loadCustomerGroupByCode($groupCode)
     {
-        return $this->groupFactory->create()
+        return $this->groupFactory
+            ->create()
             ->load($groupCode, 'customer_group_code');
     }
 }

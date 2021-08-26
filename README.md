@@ -1,4 +1,12 @@
-# Tier Price Upload # 
+# Magento 2 Tier Price Upload # 
+
+![phpcs](https://github.com/DominicWatts/EnvironmentCheck/workflows/phpcs/badge.svg)
+
+![PHPCompatibility](https://github.com/DominicWatts/EnvironmentCheck/workflows/PHPCompatibility/badge.svg)
+
+![PHPStan](https://github.com/DominicWatts/EnvironmentCheck/workflows/PHPStan/badge.svg)
+
+![php-cs-fixer](https://github.com/DominicWatts/EnvironmentCheck/workflows/php-cs-fixer/badge.svg)
 
 # Install instructions #
 
